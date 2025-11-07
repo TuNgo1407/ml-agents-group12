@@ -1,3 +1,4 @@
+import os
 import os.path
 import warnings
 
@@ -84,8 +85,21 @@ def deep_update_dict(d: Dict, update_d: Mapping) -> None:
 
 
 class SerializationSettings:
-    convert_to_onnx = True
-    onnx_opset = 9
+    # # Runtime-configurable flag: disable ONNX export by setting environment
+    # # variable MLAGENTS_CONVERT_TO_ONNX to '0', 'false', or 'no'.
+    # convert_to_onnx = os.getenv("MLAGENTS_CONVERT_TO_ONNX", "True").lower() in (
+    #     "1",
+    #     "true",
+    #     "yes",
+    # )
+    # # Allow overriding opset via MLAGENTS_ONNX_OPSET env var.
+    # try:
+    #     onnx_opset = int(os.getenv("MLAGENTS_ONNX_OPSET", "9"))
+    # except Exception:
+    #     onnx_opset = 9
+
+        convert_to_onnx = False
+        onnx_opset = 9
 
 
 @attr.s(auto_attribs=True)

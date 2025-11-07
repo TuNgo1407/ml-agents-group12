@@ -1,0 +1,90 @@
+diff --git a/ml-agents/mlagents/trainers/model_saver/torch_model_saver.py b/ml-agents/mlagents/trainers/model_saver/torch_model_saver.py
+index 0000000..1111111 100644
+--- a/ml-agents/mlagents/trainers/model_saver/torch_model_saver.py
++++ b/ml-agents/mlagents/trainers/model_saver/torch_model_saver.py
+@@ -47,22 +47,13 @@ class TorchModelSaver(BaseModelSaver):
+         if self.policy is None and isinstance(module, TorchPolicy):
+             self.policy = module
+             self.exporter = ModelSerializer(self.policy)
+ 
+     def save_checkpoint(self, behavior_name: str, step: int) -> Tuple[str, List[str]]:
+-        if not os.path.exists(self.model_path):
+-            os.makedirs(self.model_path)
+-        checkpoint_path = os.path.join(self.model_path, f"{behavior_name}-{step}")
+-        state_dict = {
+-            name: module.state_dict() for name, module in self.modules.items()
+-        }
+-        pytorch_ckpt_path = f"{checkpoint_path}.pt"
+-        export_ckpt_path = f"{checkpoint_path}.onnx"
+-        torch.save(state_dict, f"{checkpoint_path}.pt")
+-        torch.save(state_dict, os.path.join(self.model_path, DEFAULT_CHECKPOINT_NAME))
+-        self.export(checkpoint_path, behavior_name)
+-        return export_ckpt_path, [pytorch_ckpt_path]
++        # Disabled model saving
++        return "", []
+ 
+     def export(self, output_filepath: str, behavior_name: str) -> None:
+-        if self.exporter is not None:
+-            self.exporter.export_policy_model(output_filepath)
++        # Disabled model exporting
++        pass
+ 
+     def initialize_or_load(self, policy: Optional[TorchPolicy] = None) -> None:
+         if self.load:
+             model_path = os.path.join(
+diff --git a/ml-agents/mlagents/trainers/torch_entities/model_serialization.py b/ml-agents/mlagents/trainers/torch_entities/model_serialization.py
+index 0000000..1111111 100644
+--- a/ml-agents/mlagents/trainers/torch_entities/model_serialization.py
++++ b/ml-agents/mlagents/trainers/torch_entities/model_serialization.py
+@@ -152,19 +152,9 @@ class ModelSerializer:
+         self._policy = policy
+ 
+     def export_policy_model(self, output_filepath: str) -> None:
+-        """
+-        Exports a Torch model for a Policy to .onnx format for Unity embedding.
++        # Disabled ONNX export
++        logger.debug("ONNX export disabled")
+ 
+-        :param output_filepath: path (without suffix) for the model file(s)
+-        """
+-        onnx_output_path = f"{output_filepath}.onnx"
+-        logger.debug(f"Converting to {onnx_output_path}")
+-        with exporting_to_onnx():
+-            torch.onnx.export(
+-                self.policy.actor,
+-                self.dummy_input,
+-                onnx_output_path,
+-                opset_version=SerializationSettings.onnx_opset,
+-                input_names=self.input_names,
+-                output_names=self.output_names,
+-                dynamic_axes=self.dynamic_axes,
+-            )
+-        logger.info(f"Exported {onnx_output_path}")
+diff --git a/ml-agents/mlagents/trainers/trainer/rl_trainer.py b/ml-agents/mlagents/trainers/trainer/rl_trainer.py
+index 0000000..1111111 100644
+--- a/ml-agents/mlagents/trainers/trainer/rl_trainer.py
++++ b/ml-agents/mlagents/trainers/trainer/rl_trainer.py
+@@ -134,19 +134,9 @@ class RLTrainer(Trainer):
+     def _maybe_save_model(self, step_after_process: int) -> None:
+-        """
+-        If processing the trajectory will make the step exceed the next model write,
+-        save the model. This logic ensures models are written on the update step and not in between.
+-        :param step_after_process: the step count after processing the next trajectory.
+-        """
+-        if self._next_save_step == 0:  # Don't save the first one
+-            self._next_save_step = self._get_next_interval_step(
+-                self.trainer_settings.checkpoint_interval
+-            )
+-        if step_after_process >= self._next_save_step and self.get_step != 0:
+-            self._checkpoint()
++        # Disabled model saving
++        pass
+
+     def save_model(self) -> None:
+-        """
+-        Saves the policy associated with this trainer.
+-        """
+-        model_checkpoint = self._checkpoint()
+-        self.model_saver.copy_final_model(model_checkpoint.file_path)
++        # Disabled model saving
++        pass

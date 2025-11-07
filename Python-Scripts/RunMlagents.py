@@ -40,9 +40,13 @@ def run_mlagents(run_id:str, yaml_abs_path:str):
             process = subprocess.Popen(cmd, shell=True,cwd=project_root)
         else:
         # Linux/Mac
-            cmd = f"conda activate mlagents && mlagents-learn \"{yaml_abs_path}\" --run-id={run_id} {resume_flag}" 
-            process = subprocess.Popen(cmd, shell=True, executable='/bin/bash',cwd=project_root)
+            cmd = f"conda run -n mlagents mlagents-learn \"{yaml_abs_path}\" --run-id={run_id} {resume_flag}"
+            process = subprocess.Popen(cmd, shell=True, cwd=project_root)
         
+        # cmd = f"conda run -n mlagents mlagents-learn \"{yaml_abs_path}\" --run-id={run_id} {resume_flag}"
+        # process = subprocess.Popen(cmd, shell=True, cwd=project_root)
+
+
         process.wait()
 
         if process.returncode == 0:
