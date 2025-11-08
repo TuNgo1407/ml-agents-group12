@@ -8,7 +8,6 @@ from FindAbsPath import get_absolute_path
 class ConfigGenerator:
     """Generates randomized hyperparameter configurations for 3DBall"""
     
-    # Define reasonable ranges for each hyperparameter based on ML-Agents best practices
     PARAM_RANGES = {
         "learning_rate": [1e-5, 3e-5, 1e-4, 3e-4, 1e-3, 3e-3],
         "batch_size": [32, 64, 128, 256, 512, 1024, 2048],
@@ -45,12 +44,10 @@ class ConfigGenerator:
         with open(base_config_path, 'r') as f:
             config_data = yaml.safe_load(f)
         
-        # Update hyperparameters in the behavior section
         behavior_name = "3DBall"
         if behavior_name in config_data.get("behaviors", {}):
             behavior = config_data["behaviors"][behavior_name]
             
-            # Map our parameter names to YAML structure
             param_mapping = {
                 "learning_rate": ["hyperparameters", "learning_rate"],
                 "batch_size": ["hyperparameters", "batch_size"],
@@ -69,23 +66,19 @@ class ConfigGenerator:
                     current = behavior
                     path = param_mapping[param]
                     
-                    # Navigate to the parent level
                     for key in path[:-1]:
                         if key not in current:
                             current[key] = {}
                         current = current[key]
                     
-                    # Set the value
                     current[path[-1]] = value
         
-        # Write updated config
         with open(output_path, 'w') as f:
             yaml.dump(config_data, f, default_flow_style=False, sort_keys=False)
     
     @classmethod
     def validate_config(cls, config: Dict[str, Any]) -> bool:
         """Validate that the generated config is reasonable"""
-        # Basic validation rules
         if config['batch_size'] > config['buffer_size']:
             return False
         
@@ -101,5 +94,4 @@ class ConfigGenerator:
             config = cls.generate_config()
             if cls.validate_config(config):
                 return config
-        # If no valid config after max attempts, return the last one
         return config

@@ -35,7 +35,6 @@ def _check_convergence(run_id: str, window: int = 50, threshold: float = 0.02) -
         recent_mean = np.mean(recent_rewards)
         previous_mean = np.mean(previous_rewards)
         
-        # Convergence: recent performance improvement < threshold
         improvement = (recent_mean - previous_mean) / (abs(previous_mean) + 1e-8)
         return abs(improvement) < threshold
         
@@ -44,7 +43,7 @@ def _check_convergence(run_id: str, window: int = 50, threshold: float = 0.02) -
 
 def _monitor_convergence(run_id: str, process, check_interval: int = 30):
     """Monitor training for convergence and stop when detected"""
-    max_checks = 240  # Maximum 2 hours at 30-second intervals
+    max_checks = 240
     checks = 0
     
     while checks < max_checks and process.poll() is None:
@@ -79,7 +78,6 @@ def run_mlagents(run_id: str, yaml_abs_path: str):
         resume_flag = "--resume" if run_id_exists else "--force"
         project_root = get_project_root()
         
-        # Build the command
         if sys.platform == "win32":
             cmd = f"conda activate mlagents && mlagents-learn \"{yaml_abs_path}\" --run-id={run_id} {resume_flag}" 
         else:
@@ -88,7 +86,6 @@ def run_mlagents(run_id: str, yaml_abs_path: str):
         print(f"Executing command: {cmd}")
         process = subprocess.Popen(cmd, shell=True, cwd=project_root)
         
-        # Start convergence monitoring for new runs
         if not run_id_exists:
             monitor_thread = Thread(target=_monitor_convergence, args=(run_id, process, 30))
             monitor_thread.daemon = True
@@ -117,7 +114,6 @@ def _check_run_id_exists_in_results_dir(run_id: str):
     results_abs_path = get_absolute_path("results")
     run_path = os.path.join(results_abs_path, run_id)
 
-    # Check if path exists and path is directory
     if os.path.exists(run_path) and os.path.isdir(run_path):
         return True
     else: 

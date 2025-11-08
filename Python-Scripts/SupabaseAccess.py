@@ -86,8 +86,6 @@ def upsert_training_table (data_dict : dict):
 
 		if not data_dict:
 			raise ValueError ("Data dict is empty")
-		
-		# records = df.to_dict('records')
 		response = supabase.table(training_table).upsert(data_dict, on_conflict="run_id").execute()
 
 		print("_" * 70)

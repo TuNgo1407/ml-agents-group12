@@ -11,7 +11,6 @@ from datetime import datetime
 def main():
     """Automatically generate config, run training, and store results"""
     
-    # Generate unique run ID and valid config
     run_id = ConfigGenerator.create_run_id()
     new_config = ConfigGenerator.generate_valid_config()
     
@@ -22,7 +21,6 @@ def main():
         print(f"  {key}: {value}")
     print("=" * 70)
     
-    # Create temporary config file for this run
     base_config_path = get_absolute_path("config/ppo/3DBall.yaml")
     
     with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as temp_file:
@@ -31,25 +29,18 @@ def main():
     training_start_time = datetime.now()
     
     try:
-        # Update base config with new hyperparameters
         ConfigGenerator.update_yaml_config(base_config_path, new_config, temp_config_path)
         
-        # Run training with new config
         run_mlagents(run_id, temp_config_path)
         
-        # Calculate training duration
         training_end_time = datetime.now()
         training_duration = (training_end_time - training_start_time).total_seconds()
         
-        # Collect and store results
         data = get_all_data(run_id, temp_config_path)
-        
-        # Add convergence and timing information
-        data['convergence_detected'] = True  # If we reached here, early stopping worked
+        data['convergence_detected'] = True
         data['training_duration_seconds'] = int(training_duration)
         data['config_hash'] = str(hash(frozenset(new_config.items())))
         
-        # Add the hyperparameters to the data for storage
         for key, value in new_config.items():
             data[key] = value
         
@@ -63,7 +54,6 @@ def main():
         
     except Exception as e:
         print(f"Error in run {run_id}: {e}")
-        # Still try to store partial data if possible
         try:
             partial_data = {
                 'run_id': run_id,
@@ -71,7 +61,6 @@ def main():
                 'error_message': str(e),
                 'training_duration_seconds': int((datetime.now() - training_start_time).total_seconds())
             }
-            # Add hyperparameters to partial data
             for key, value in new_config.items():
                 partial_data[key] = value
             upsert_training_table(partial_data)
@@ -79,7 +68,6 @@ def main():
             print(f"Failed to store error data: {store_error}")
         raise
     finally:
-        # Clean up temporary config file
         if os.path.exists(temp_config_path):
             os.unlink(temp_config_path)
 
@@ -90,11 +78,9 @@ def continuous_training_mode(runs_per_hour: int = 2):
     while True:
         try:
             main()
-            
-            # Wait before next run (with some randomness to avoid patterns)
             delay_minutes = 60 / runs_per_hour
-            jitter = random.uniform(-5, 5)  # Add some randomness
-            wait_time = max(5, delay_minutes + jitter)  # Minimum 5 minutes between runs
+            jitter = random.uniform(-5, 5)
+            wait_time = max(5, delay_minutes + jitter)
             
             print(f"Waiting {wait_time:.1f} minutes before next run...")
             time.sleep(wait_time * 60)
@@ -105,7 +91,7 @@ def continuous_training_mode(runs_per_hour: int = 2):
         except Exception as e:
             print(f"Error in continuous training: {e}")
             print("Waiting 10 minutes before retry...")
-            time.sleep(600)  # Wait 10 minutes before retry
+            time.sleep(600)
 
 if __name__ == "__main__":
     import sys
@@ -115,5 +101,4 @@ if __name__ == "__main__":
         runs_per_hour = int(sys.argv[2]) if len(sys.argv) > 2 else 2
         continuous_training_mode(runs_per_hour)
     else:
-        # Single run mode
         main()

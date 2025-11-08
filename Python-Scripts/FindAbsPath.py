@@ -14,7 +14,6 @@ def get_project_root():
     """Find and return the project root directory"""
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
-    # Find repository root by looking for .git folder and requirements.txt
     root_markers = ['.git', 'requirements.txt']
     
     search_dir = current_dir
@@ -24,10 +23,10 @@ def get_project_root():
             for marker in root_markers:
                 marker_path = os.path.join(search_dir, marker)
                 if os.path.exists(marker_path):
-                    return search_dir  # Return the root directory 
+                    return search_dir
             
             parent_dir = os.path.dirname(search_dir)
-            if parent_dir == search_dir:  # Reached filesystem root
+            if parent_dir == search_dir:
                 raise FileNotFoundError("Could not find repository root. Make sure you're running from within the git repository.")
             
             search_dir = parent_dir
@@ -42,7 +41,6 @@ def get_absolute_path(folder: str):
     project_root = get_project_root()
     folder_path = os.path.join(project_root, folder)
     
-    # Check if folder exists
     if not os.path.exists(folder_path):
         raise FileNotFoundError(f"{folder} folder not found at: {folder_path}")
     
