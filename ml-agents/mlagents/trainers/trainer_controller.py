@@ -71,14 +71,9 @@ class TrainerController:
     @timed
     def _save_models(self):
         """
-        Saves current model to checkpoint folder.
+        Model saving disabled.
         """
-        if self.rank is not None and self.rank != 0:
-            return
-
-        for brain_name in self.trainers.keys():
-            self.trainers[brain_name].save_model()
-        self.logger.debug("Saved Model")
+        pass
 
     @staticmethod
     def _create_output_path(output_path):

@@ -134,48 +134,15 @@ class RLTrainer(Trainer):
     @timed
     def _checkpoint(self) -> ModelCheckpoint:
         """
-        Checkpoints the policy associated with this trainer.
+        Checkpointing disabled.
         """
-        n_policies = len(self.policies.keys())
-        if n_policies > 1:
-            logger.warning(
-                "Trainer has multiple policies, but default behavior only saves the first."
-            )
-        export_path, auxillary_paths = self.model_saver.save_checkpoint(
-            self.brain_name, self._step
-        )
-        new_checkpoint = ModelCheckpoint(
-            int(self._step),
-            export_path,
-            self._policy_mean_reward(),
-            time.time(),
-            auxillary_file_paths=auxillary_paths,
-        )
-        ModelCheckpointManager.add_checkpoint(
-            self.brain_name, new_checkpoint, self.trainer_settings.keep_checkpoints
-        )
-        return new_checkpoint
+        return ModelCheckpoint(0, "", 0, 0)
 
     def save_model(self) -> None:
         """
-        Saves the policy associated with this trainer.
+        Model saving disabled.
         """
-        n_policies = len(self.policies.keys())
-        if n_policies > 1:
-            logger.warning(
-                "Trainer has multiple policies, but default behavior only saves the first."
-            )
-        elif n_policies == 0:
-            logger.warning("Trainer has no policies, not saving anything.")
-            return
-
-        model_checkpoint = self._checkpoint()
-        self.model_saver.copy_final_model(model_checkpoint.file_path)
-        export_ext = "onnx"
-        final_checkpoint = attr.evolve(
-            model_checkpoint, file_path=f"{self.model_saver.model_path}.{export_ext}"
-        )
-        ModelCheckpointManager.track_final_checkpoint(self.brain_name, final_checkpoint)
+        pass
 
     @abc.abstractmethod
     def _update_policy(self) -> bool:
@@ -252,16 +219,9 @@ class RLTrainer(Trainer):
 
     def _maybe_save_model(self, step_after_process: int) -> None:
         """
-        If processing the trajectory will make the step exceed the next model write,
-        save the model. This logic ensures models are written on the update step and not in between.
-        :param step_after_process: the step count after processing the next trajectory.
+        Model saving disabled.
         """
-        if self._next_save_step == 0:  # Don't save the first one
-            self._next_save_step = self._get_next_interval_step(
-                self.trainer_settings.checkpoint_interval
-            )
-        if step_after_process >= self._next_save_step and self.get_step != 0:
-            self._checkpoint()
+        pass
 
     def _warn_if_group_reward(self, buffer: AgentBuffer) -> None:
         """

@@ -47,22 +47,25 @@ class TorchModelSaver(BaseModelSaver):
             self.exporter = ModelSerializer(self.policy)
 
     def save_checkpoint(self, behavior_name: str, step: int) -> Tuple[str, List[str]]:
-        if not os.path.exists(self.model_path):
-            os.makedirs(self.model_path)
-        checkpoint_path = os.path.join(self.model_path, f"{behavior_name}-{step}")
-        state_dict = {
-            name: module.state_dict() for name, module in self.modules.items()
-        }
-        pytorch_ckpt_path = f"{checkpoint_path}.pt"
-        export_ckpt_path = f"{checkpoint_path}.onnx"
-        torch.save(state_dict, f"{checkpoint_path}.pt")
-        torch.save(state_dict, os.path.join(self.model_path, DEFAULT_CHECKPOINT_NAME))
-        self.export(checkpoint_path, behavior_name)
-        return export_ckpt_path, [pytorch_ckpt_path]
+        # Disabled model saving
+        return "", []
 
-    def export(self, output_filepath: str, behavior_name: str) -> None:
-        if self.exporter is not None:
-            self.exporter.export_policy_model(output_filepath)
+    # def export(self, output_filepath: str, behavior_name: str) -> None:
+    #     # Respect the global serialization setting: if ONNX export is disabled,
+    #     # skip the potentially expensive torch.onnx.export call entirely.
+    #     from mlagents.trainers.settings import SerializationSettings
+
+    #     if not SerializationSettings.convert_to_onnx:
+    #         logger.info(
+    #             "ONNX export is disabled via SerializationSettings; skipping export."
+    #         )
+    #         return
+
+    #     if self.exporter is not None:
+    #         try:
+    #             self.exporter.export_policy_model(output_filepath)
+    #         except Exception as e:
+    #             logger.error(f"Failed to export policy to ONNX: {e}")
 
     def initialize_or_load(self, policy: Optional[TorchPolicy] = None) -> None:
         # Initialize/Load registered self.policy by default.
