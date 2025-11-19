@@ -1,32 +1,26 @@
 # Training ML-Agents Guidelines
 
-
-## Install Python Packages (You only need to do once for first time)
+## Building your Enviorment in Unity
 First, Make sure you have installed:
-- python 3.10.12 (in your env)
+- python 3.10.11 (in your env)
 - mlagent 1.1.0
 - Unity Editor 2023.2.12f1
 
 And completed the [Installation Guide](https://github.com/TuNgo1407/ml-agents-group12/blob/develop/docs/Readme.md) beforehand.
 
-
-### Python Package Installation:  
-1. On your terminal, activate conda mlagents:
-    ```bash
-    conda activate mlagents
-    ```
-
-2. Navigate (cd) to directory `ml-agents-group12`
-
-3. Install all python packages in `ml-agents-group12/requirements.txt` by this command:
-    ```bash
-    pip install -r requirements.txt 
-    ```
+1. Navigate to the 3DBall scene in the Unity Editor (`Assets/ML-Agents/Examples/3DBall/Scenes`)
+2. Double click the 3DBall scene
+3. At the top left, under files click `Build Settings...`
+4. Click `Add Open Scenes` and check `Development Build`
+5. Make sure the `Target Platform` and `Architecture` correspond with your machine
+6. Click build and create a folder within `ml-agents-group12` to contain the build 
+7. Go to `Python-Scripts/RunMlagents.py` line 82. Check if the path corresponds with your build 
 
 ## Run ML-Agents Training
-
 1. On your terminal, navigate (cd) to directory `ml-agents-group12/Python-Scripts`
-
+    ```bash
+    cd ml-agents-group12/Python-Scripts
+    ```
 2. Activate `mlagents env` and disable saving unnecessary files simultaneously by this command: 
     ```bash
     conda activate mlagents && python disable_model_saving.py
@@ -35,11 +29,14 @@ And completed the [Installation Guide](https://github.com/TuNgo1407/ml-agents-gr
     ```
     Successfully disabled model saving and ONNX export in ML-Agents
     ```
-3. Now you can start training by this command:
+3. Train a single run with the first command or do multiple with the second:
     ```bash
     python StartTraining.py
     ```
-4. **WAIT** until you see this output, Then you can press "play" button in your `Unitiy Editor` 
+    ```bash 
+    python ContinuousTraining.py
+    ```
+4. **WAIT** until you see this output
     <details>
     <summary>Click to view exmaple output</summary>
 
