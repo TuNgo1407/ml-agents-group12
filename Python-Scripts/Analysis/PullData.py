@@ -21,7 +21,6 @@ def pull_data_from_supabase() -> pd.DataFrame:
 
     response = supabase.table(training_table) \
     .select("*") \
-    .eq("error_occurred", False) \
     .execute()
     data = response.data
 
