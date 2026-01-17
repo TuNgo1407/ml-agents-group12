@@ -15,7 +15,7 @@ from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.linear_model import Ridge, Lasso, ElasticNet
 from data_loader import DataLoader
 from evaluation_framework import StandardEvaluator
-
+from sklearn.model_selection import GridSearchCV, KFold
 
 class LinearModelDeveloper:
     def __init__(self, target: str):
@@ -49,9 +49,33 @@ class LinearModelDeveloper:
         """
         pipeline = Pipeline([
             ('scaler', StandardScaler()),
-            ('model', Ridge(alpha=1.0, random_state=42)) #simple default
+            ('poly', PolynomialFeatures(include_bias=False)),
+            ('model', Ridge(random_state=42)) 
         ])
-        
+
+        # Define hyperparameter grid
+        param_grid = {
+            'poly__degree': [1, 2],
+            'model__alpha': [0.1, 1.0, 10.0, 100.0]
+        }
+
+        # Setup cross-validation
+        cv = KFold(n_splits=5, shuffle=True, random_state=42)
+
+        # Run grid search
+        grid = GridSearchCV(
+            pipeline,
+            param_grid,
+            cv=cv,
+            scoring='neg_mean_squared_error',
+            n_jobs=-1,
+            verbose=1
+        )
+
+        # Fit grid search
+        grid.fit(self.X_train, self.y_train)
+        pipeline = grid.best_estimator_
+
         return pipeline
     
     def run(self):
