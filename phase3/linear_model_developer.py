@@ -65,8 +65,7 @@ class LinearModelDeveloper:
         }
 
         best_model = min(scores, key=scores.get)
-        print(f"Best model selected: {best_model} with score {scores[best_model]:.4f}")
-
+        
         if best_model == 'Ridge':
             pipeline = best_ridge
         elif best_model == 'ElasticNet':
@@ -181,6 +180,9 @@ class LinearModelDeveloper:
         print("\nFinding best linear model...")
         
         best_model = self.find_best_model()
+
+        print(f"\nModel selected: {best_model.get_params()['model'].__class__.__name__}")
+        print(f"Best hyperparameters: {best_model.get_params()}")
         
         print("\nEvaluating with standard method...")
         metrics = self.evaluator.evaluate(
