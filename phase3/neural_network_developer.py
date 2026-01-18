@@ -75,7 +75,8 @@ class NeuralNetworkDeveloper:
 
         best_model = self.find_best_model()
 
-        print(f"Model selected: {type(best_model).__name__}")
+        print(f"Model selected: {best_model.get_params()['model'].__class__.__name__}")
+        print(f"Best hyperparameters: {best_model.get_params()}")
 
         print("\nEvaluating with standard method...")
         metrics = self.evaluator.evaluate(
