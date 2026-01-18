@@ -9,13 +9,14 @@ This script finds:
 - Best linear model for late_phase_std (Target 2)
 """
 
+from typing import Tuple
 import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.linear_model import Ridge, Lasso, ElasticNet
 from data_loader import DataLoader
 from evaluation_framework import StandardEvaluator
-
+from sklearn.model_selection import GridSearchCV, KFold
 
 class LinearModelDeveloper:
     def __init__(self, target: str):
@@ -37,23 +38,142 @@ class LinearModelDeveloper:
     
     def find_best_model(self) -> Pipeline:
         """
-        IMPLEMENT YOUR APPROACH HERE.
-        
-        Freedom:
-        - Ridge, Lasso, ElasticNet, or any sklearn linear model
-        - Polynomial features, interactions, transformations
-        - Any hyperparameter tuning method
-        
-        Requirements:
-        - Return sklearn Pipeline
+        Finds the best linear model among Ridge, ElasticNet, and Lasso
+        Each model is trained with hyperparameter tuning via grid search.
+        Returns the best model pipeline.
         """
-        pipeline = Pipeline([
-            ('scaler', StandardScaler()),
-            ('model', Ridge(alpha=1.0, random_state=42)) #simple default
-        ])
-        
+
+        print("Training Ridge... ")
+        best_ridge, ridge_score = self.ridge()
+        print(f"Ridge best score (neg MSE): {ridge_score:.4f}")
+
+        print("Training ElasticNet... ")
+        best_elastic_net, elastic_net_score = self.elastic_net()
+        print(f"ElasticNet best score (neg MSE): {elastic_net_score:.4f}")
+
+        print("Training Lasso... ")
+        best_lasso, lasso_score = self.Lasso()
+        print(f"Lasso best score (neg MSE): {lasso_score:.4f}")
+
+        scores = {
+            'Ridge': ridge_score,
+            'ElasticNet': elastic_net_score,
+            'Lasso': lasso_score
+        }
+
+        best_model = max(scores, key=scores.get)
+        print(f"Best model selected: {best_model} with score {scores[best_model]:.4f}")
+
+        if best_model == 'Ridge':
+            pipeline = best_ridge
+        elif best_model == 'ElasticNet':
+            pipeline = best_elastic_net
+        else:
+            pipeline = best_lasso
+
         return pipeline
     
+    def ridge(self) -> Tuple[Pipeline, float]:
+         # Runs grid search for Ridge model
+        # Define pipeline
+        pipeline = Pipeline([
+            ('scaler', StandardScaler()),
+            ('poly', PolynomialFeatures(include_bias=False)),
+            ('model', Ridge(random_state=42)) 
+        ])
+
+        # Define hyperparameter grid
+        param_grid = {
+            'poly__degree': [1, 2],
+            'model__alpha': [0.1, 1.0, 10.0, 100.0]
+        }
+
+        # Setup cross-validation
+        cv = KFold(n_splits=5, shuffle=True, random_state=42)
+
+        # Run grid search
+        grid = GridSearchCV(
+            pipeline,
+            param_grid,
+            cv=cv,
+            scoring='neg_mean_squared_error',
+            n_jobs=-1,
+            verbose=0
+        )
+
+        # Fit grid search
+        grid.fit(self.X_train, self.y_train)
+
+        return grid.best_estimator_, grid.best_score_
+    
+    def elastic_net(self) -> Tuple[Pipeline, float]:
+        # Runs grid search for ElasticNet model
+        # Define pipeline
+        pipeline = Pipeline([
+            ('scaler', StandardScaler()),
+            ('poly', PolynomialFeatures(include_bias=False)),
+            ('model', ElasticNet(random_state=42, max_iter=2000)) 
+        ])
+
+        # Define hyperparameter grid
+        param_grid = {
+            'poly__degree': [1, 2],
+            'model__alpha': [0.001, 0.01, 0.1, 1.0, 10.0, 100.0],
+            'model__l1_ratio': [0.1, 0.5, 0.7, 0.9, 0.99, 1.0]
+        }
+
+        # Setup cross-validation
+        cv = KFold(n_splits=5, shuffle=True, random_state=42)
+
+        # Run grid search
+        grid = GridSearchCV(
+            pipeline,
+            param_grid,
+            cv=cv,
+            scoring='neg_mean_squared_error',
+            n_jobs=-1,
+            verbose=0
+        )
+
+        # Fit grid search
+        grid.fit(self.X_train, self.y_train)
+
+        return grid.best_estimator_, grid.best_score_
+    
+    def Lasso(self) -> Tuple[Pipeline, float]:
+         # Runs grid search for Lasso model
+        # Define pipeline
+        pipeline = Pipeline([
+            ('scaler', StandardScaler()),
+            ('poly', PolynomialFeatures(include_bias=False)),
+            ('model', Lasso(random_state=42, max_iter=2000)) 
+        ])
+
+        # Define hyperparameter grid
+        param_grid = {
+            'poly__degree': [1, 2],
+            'model__alpha': [0.001, 0.01, 0.1, 1.0, 10.0]
+        }
+
+        # Setup cross-validation
+        cv = KFold(n_splits=5, shuffle=True, random_state=42)
+
+        # Run grid search
+        grid = GridSearchCV(
+            pipeline,
+            param_grid,
+            cv=cv,
+            scoring='neg_mean_squared_error',
+            n_jobs=-1,
+            verbose=0
+        )
+
+        # Fit grid search
+        grid.fit(self.X_train, self.y_train)
+
+        return grid.best_estimator_, grid.best_score_
+
+
     def run(self):
         print("\nFinding best linear model...")
         
