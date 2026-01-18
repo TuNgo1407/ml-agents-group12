@@ -64,7 +64,7 @@ class LinearModelDeveloper:
             'Lasso': np.sqrt(-lasso_score)
         }
 
-        best_model = max(scores, key=scores.get)
+        best_model = min(scores, key=scores.get)
         print(f"Best model selected: {best_model} with score {scores[best_model]:.4f}")
 
         if best_model == 'Ridge':
@@ -182,7 +182,7 @@ class LinearModelDeveloper:
         
         best_model = self.find_best_model()
         
-        print(f"Model selected: {type(best_model).__name__}")
+        # print(f"Model selected: {type(best_model).__name__}")
         if hasattr(best_model, 'best_params_'):
             print(f"Best hyperparameters: {best_model.best_params_}")
         
