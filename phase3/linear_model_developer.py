@@ -182,10 +182,6 @@ class LinearModelDeveloper:
         
         best_model = self.find_best_model()
         
-        # print(f"Model selected: {type(best_model).__name__}")
-        if hasattr(best_model, 'best_params_'):
-            print(f"Best hyperparameters: {best_model.best_params_}")
-        
         print("\nEvaluating with standard method...")
         metrics = self.evaluator.evaluate(
             best_model,
