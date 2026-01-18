@@ -21,22 +21,15 @@ class NeuralNetworkDeveloper:
         print(f"NEURAL NETWORK DEVELOPER | Target: {target}")
 
     def find_best_model(self) -> Pipeline:
-        if self.target == "final_10_percent_reward_mean":
-            tol = 5.0
-        else:
-            tol = 1.0
 
         pipeline = Pipeline([
             ('scaler', StandardScaler()),
             ('model', MLPRegressor(
                 random_state=42,
                 max_iter=3000,
-
                 early_stopping=True,
                 validation_fraction=0.15,
-                n_iter_no_change=30,
-
-                tol=tol,
+                n_iter_no_change=30
             ))
         ])
 
@@ -74,10 +67,6 @@ class NeuralNetworkDeveloper:
         )
 
         search.fit(self.X_train, self.y_train)
-        print(
-            f"Training stopped after "
-            f"{search.best_estimator_.named_steps['model'].n_iter_} iterations"
-        )
 
         return search.best_estimator_
 
