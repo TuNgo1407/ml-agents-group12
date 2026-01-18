@@ -44,21 +44,24 @@ class LinearModelDeveloper:
         """
 
         print("Training Ridge... ")
-        best_ridge, ridge_score = self.ridge()
-        print(f"Ridge best score (neg MSE): {ridge_score:.4f}")
+        best_ridge, ridge_score, ridge_params = self.ridge()
+        print(f"Ridge best CV score (RMSE): {np.sqrt(-ridge_score):.4f}")
+        print(f"Ridge best params: {ridge_params}")
 
         print("Training ElasticNet... ")
-        best_elastic_net, elastic_net_score = self.elastic_net()
-        print(f"ElasticNet best score (neg MSE): {elastic_net_score:.4f}")
+        best_elastic_net, elastic_net_score, elastic_net_params = self.elastic_net()
+        print(f"ElasticNet best CV score (RMSE): {np.sqrt(-elastic_net_score):.4f}")
+        print(f"ElasticNet best params: {elastic_net_params}")
 
         print("Training Lasso... ")
-        best_lasso, lasso_score = self.Lasso()
-        print(f"Lasso best score (neg MSE): {lasso_score:.4f}")
+        best_lasso, lasso_score, lasso_params = self.Lasso()
+        print(f"Lasso best CV score (RMSE): {np.sqrt(-lasso_score):.4f}")
+        print(f"Lasso best params: {lasso_params}")
 
         scores = {
-            'Ridge': ridge_score,
-            'ElasticNet': elastic_net_score,
-            'Lasso': lasso_score
+            'Ridge': np.sqrt(-ridge_score),
+            'ElasticNet': np.sqrt(-elastic_net_score),
+            'Lasso': np.sqrt(-lasso_score)
         }
 
         best_model = max(scores, key=scores.get)
@@ -73,7 +76,7 @@ class LinearModelDeveloper:
 
         return pipeline
     
-    def ridge(self) -> Tuple[Pipeline, float]:
+    def ridge(self) -> Tuple[Pipeline, float, str]:
          # Runs grid search for Ridge model
         # Define pipeline
         pipeline = Pipeline([
@@ -104,9 +107,9 @@ class LinearModelDeveloper:
         # Fit grid search
         grid.fit(self.X_train, self.y_train)
 
-        return grid.best_estimator_, grid.best_score_
+        return grid.best_estimator_, grid.best_score_, grid.best_params_
     
-    def elastic_net(self) -> Tuple[Pipeline, float]:
+    def elastic_net(self) -> Tuple[Pipeline, float, str]:
         # Runs grid search for ElasticNet model
         # Define pipeline
         pipeline = Pipeline([
@@ -138,10 +141,10 @@ class LinearModelDeveloper:
         # Fit grid search
         grid.fit(self.X_train, self.y_train)
 
-        return grid.best_estimator_, grid.best_score_
+        return grid.best_estimator_, grid.best_score_, grid.best_params_
     
-    def Lasso(self) -> Tuple[Pipeline, float]:
-         # Runs grid search for Lasso model
+    def Lasso(self) -> Tuple[Pipeline, float, str]:
+        # Runs grid search for Lasso model
         # Define pipeline
         pipeline = Pipeline([
             ('scaler', StandardScaler()),
@@ -171,7 +174,7 @@ class LinearModelDeveloper:
         # Fit grid search
         grid.fit(self.X_train, self.y_train)
 
-        return grid.best_estimator_, grid.best_score_
+        return grid.best_estimator_, grid.best_score_, grid.best_params_
 
 
     def run(self):
