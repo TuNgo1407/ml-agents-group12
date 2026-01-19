@@ -37,7 +37,7 @@ def get_project_root():
     
 
 def get_absolute_path(folder: str):
-    """Get absolute path of a folder within project root (your existing function)"""
+    """Get absolute path of a folder within project root"""
     project_root = get_project_root()
     folder_path = os.path.join(project_root, folder)
     

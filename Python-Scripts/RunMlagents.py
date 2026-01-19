@@ -77,19 +77,44 @@ def run_mlagents(run_id: str, yaml_abs_path: str):
         run_id_exists = _check_run_id_exists_in_results_dir(run_id)     
         resume_flag = "--resume" if run_id_exists else "--force"
         project_root = get_project_root()
+
+        # CHECK/CHANGE THIS BEFORE RUNNING, MAKE SURE IT CORRESPONDS WITH YOUR FILES
+        build_path = os.path.join(project_root, "Builds", "UnityEnvironment.exe")
         
+        if not os.path.exists(build_path):
+            raise FileNotFoundError(f"Build not found at {build_path}")
+
         if sys.platform == "win32":
-            cmd = f"conda activate mlagents && mlagents-learn \"{yaml_abs_path}\" --run-id={run_id} {resume_flag}" 
+            cmd = f"conda activate mlagents && mlagents-learn \"{yaml_abs_path}\" --env=\"{build_path}\" --run-id={run_id} {resume_flag} --no-graphics" 
         else:
-            cmd = f"conda run -n mlagents mlagents-learn \"{yaml_abs_path}\" --run-id={run_id} {resume_flag}"
+            cmd = f"conda run -n mlagents mlagents-learn \"{yaml_abs_path}\" --env=\"{build_path}\" --run-id={run_id} {resume_flag} --no-graphics"
         
         print(f"Executing command: {cmd}")
-        process = subprocess.Popen(cmd, shell=True, cwd=project_root)
+        process = subprocess.Popen(
+            cmd, 
+            shell=True, 
+            cwd=project_root,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+            bufsize=1
+        )
         
         if not run_id_exists:
             monitor_thread = Thread(target=_monitor_convergence, args=(run_id, process, 30))
             monitor_thread.daemon = True
             monitor_thread.start()
+
+        #Trying to get the errors
+        captured_lines = []
+        try:
+            for line in iter(process.stdout.readline, ""):
+                if line == "" and process.poll() is not None:
+                    break
+                print(line, end="")
+                captured_lines.append(line)
+        except Exception as e:
+            print(f"Error while read subprocess output: {e}")
 
         process.wait()
 

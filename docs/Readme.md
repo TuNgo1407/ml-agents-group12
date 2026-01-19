@@ -17,7 +17,7 @@ In **Phase 1**, our focus is on:
 ### Prerequisites
 - Git
 - Conda
-- Unity Hub + Unity Editor version 6000.0 or later
+- Unity Hub + Unity Editor 2023.2.12f1
 
 
 ###  Install ML-Agents
@@ -29,7 +29,7 @@ cd ml-agents-group12
 ```
 2. Create Python Virtual Environment
 ```bash
-conda create -n mlagents python=3.10.12 && conda activate mlagents
+conda create -n mlagents python=3.10.11 && conda activate mlagents
 ```
 3. Inside this Virtual Environment, install ML-Agents
 ```bash
@@ -39,6 +39,11 @@ python -m pip install mlagents==1.1.0
 ```bash
 pip3 install torch~=1.13.1 -f https://download.pytorch.org/whl/torch_stable.html
 ```
+5. Install all python packages in `ml-agents-group12/requirements.txt` by this command:
+```bash
+pip install -r requirements.txt 
+```
+6. Create a folder within `ml-agents-group12` called `results`
 
 
 Use [**ML-Agents Installation Guide**](https://github.com/DennisSoemers/ml-agents/blob/fix-numpy-release-21-branch/docs/Installation.md) for more detailed and advanced installation 
