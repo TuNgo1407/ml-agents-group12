@@ -16,7 +16,14 @@ And completed the [Installation Guide](https://github.com/TuNgo1407/ml-agents-gr
 6. Click build and create a folder within `ml-agents-group12` to contain the build 
 7. Go to `Python-Scripts/RunMlagents.py` line 82. Check if the path corresponds with your build 
 
-## Run ML-Agents Training
+### Analysis Subfolder
+
+The `Analysis` subfolder contains tools for data analysis and visualization. It includes:
+- **Analysis.ipynb**: A Jupyter notebook for running analyses on the training data. It utilizes the `PullData.py` script to fetch data from Supabase and visualize results using libraries like Pandas, Seaborn, and Matplotlib.
+- **PullData.py**: A script that connects to Supabase to retrieve training data. Ensure that your environment variables for Supabase are correctly set in the `.env` file to enable data fetching.
+
+### Run ML-Agents Training
+
 1. On your terminal, navigate (cd) to directory `ml-agents-group12/Python-Scripts`
     ```bash
     cd ml-agents-group12/Python-Scripts
@@ -84,7 +91,7 @@ And completed the [Installation Guide](https://github.com/TuNgo1407/ml-agents-gr
 
 5. After the current training session is completed, you will see this output:
     <details>
-    <summary>Click to view exmaple output</summary>
+    <summary>Click to view example output</summary>
 
     ```
     ______________________________________________________________________
